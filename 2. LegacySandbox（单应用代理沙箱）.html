@@ -1,0 +1,82 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+  <meta charset="UTF-8" />
+  <meta http-equiv="X-UA-Compatible" content="IE=edge" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Document</title>
+</head>
+
+<body>
+  <script>
+    // 方式二：基于proxy的沙箱
+    // 优点 是节约内存
+    // 缺点是只能单例的情况下使用，同时加载两个应用就会有混乱风险，共用了同一个window
+    class LegacySandbox {
+      constructor() {
+        this.modifyPropsMap = new Map() // 存储被修改过的属性原始值
+        this.addedPropsMap = new Map() // 存储新添加的属性值
+        this.currentPropsMap = new Map() // 存储所有被修改或新添加的属性最新值
+
+        // 创建一个 fakeWindow 对象，并使用 Proxy 对其进行代理
+        const fakeWindow = Object.create(null)
+        const proxy = new Proxy(fakeWindow, {
+          get: (target, key, recevier) => {
+            return window[key]
+          },
+          set: (target, key, value) => {
+            if (!window.hasOwnProperty(key)) {
+              this.addedPropsMap.set(key, value) // 新添加的属性
+            } else if (!this.modifyPropsMap.has(key)) {
+              this.modifyPropsMap.set(key, window[key]) // 被修改的属性原始值
+            }
+            this.currentPropsMap.set(key, value) // 所有的添加修改操作都存储一份最新值
+            window[key] = value
+          },
+        })
+        this.proxy = proxy
+      }
+      // 设置 window 对象的属性
+      setWindowProp(key, value) {
+        if (value == undefined) {
+          delete window[key]
+        } else {
+          window[key] = value
+        }
+      }
+      // 激活沙箱
+      active() {
+        // 恢复到应用 A 上次失活之前的状态
+        this.currentPropsMap.forEach((value, key) => {
+          this.setWindowProp(key, value)
+        })
+      }
+      // 失活沙箱
+      inactive() {
+        // 被修改的属性重置为原始值
+        this.modifyPropsMap.forEach((value, key) => {
+          this.setWindowProp(key, value)
+        })
+        // 移除新添加的属性
+        this.addedPropsMap.forEach((value, key) => {
+          this.setWindowProp(key, undefined)
+        })
+      }
+    }
+    let sandbox = new LegacySandbox()
+    sandbox.proxy.a = 100
+    console.log(window.a, sandbox.proxy.a)
+    sandbox.inactive()
+    console.log(window.a, sandbox.proxy.a)
+    sandbox.active()
+    console.log(window.a, sandbox.proxy.a)
+
+    // 如何使用的？
+    // (function (window) {
+    //   window.a = 100
+    // })(sandbox.proxy)
+  </script>
+</body>
+
+</html>

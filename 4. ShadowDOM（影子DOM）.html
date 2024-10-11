@@ -1,0 +1,38 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+  <meta charset="UTF-8" />
+  <meta http-equiv="X-UA-Compatible" content="IE=edge" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Document</title>
+</head>
+
+<body>
+  <div id="root">qiankun 是一个基于 single-spa 的微前端实现库</div>
+  <script>
+    // 子应用的模版字符串
+    const template = `<div id="qiankun-xxx">
+                        <div id="app">Shadow DOM 沙箱</div>    
+                        <style>div{color:red}</style>
+                    </div>`
+
+    function createElement(appContent) {
+      const containerElement = document.createElement('div')
+      containerElement.innerHTML = appContent
+      const appElement = containerElement.firstChild // 影子宿主（template模版字符串转换成了真实的dom）
+
+      const shadow = appElement.attachShadow({ // 影子DOM（调用宿主上的 attachShadow() 来创建影子 DOM）
+        mode: 'open',
+      })
+      shadow.innerHTML = appElement.innerHTML // 给Shadow DOM附加宿主节点下的内容
+
+      appElement.innerHTML = ''
+      return appElement
+    }
+
+    document.body.appendChild(createElement(template))
+  </script>
+</body>
+
+</html>

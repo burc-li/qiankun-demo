@@ -1,0 +1,30 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+  <meta charset="UTF-8" />
+  <meta http-equiv="X-UA-Compatible" content="IE=edge" />
+  <meta name="viewport" />
+  <title>Document</title>
+</head>
+
+<body>
+  <h3>主应用，也叫基座，用来加载子应用的 webpack importMap</h3>
+  <div id="root"></div>
+  <!-- 可以在浏览器使用 ES6 的 import/export 语法, 通过 systemjs-importmap 指定依赖库的地址 -->
+  <script type="systemjs-importmap">
+    {
+        "imports": {
+          "react-dom": "https://cdn.bootcdn.net/ajax/libs/react-dom/18.2.0/umd/react-dom.development.js",
+          "react": "https://cdn.bootcdn.net/ajax/libs/react/18.2.0/umd/react.development.js"
+        }
+      }
+    </script>
+  <script src="https://cdn.bootcdn.net/ajax/libs/systemjs/6.10.1/system.min.js"></script>
+  <script>
+    // 直接加载子应用, 导入打包后的包来进行加载, 采用是 system规范
+    System.import('./index.js')
+  </script>
+</body>
+
+</html>

@@ -1,0 +1,64 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+  <meta charset="UTF-8" />
+  <meta http-equiv="X-UA-Compatible" content="IE=edge" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Document</title>
+</head>
+
+<body>
+  <!-- 沙箱：防止应用加载的时候 对widow造成污染 -->
+  <!-- a应用，更改了window属性  -->
+  <!-- b应用，先删掉a应用的属性，再更改b应用的window属性 -->
+  <!-- 先保留a应用的属性，失活的时候把修改的属性存起来，激活的时候还原回来 -->
+  <!-- 这就是快照，浪费内存，因为要给window拍照 -->
+  <script>
+    // 方法一：快照
+    // 缺点就是浪费内存， 进一步优化的可能：存储修改的或者添加的属性，不要给window拍照
+    class SnapshotSandbox {
+      constructor() {
+        this.windowSnapShot = {}; // 存储 window 对象的初始快照
+        this.modifyPropsMap = {}; // 存储全局哪些属性被修改了
+      }
+      // 激活
+      active() {
+        this.windowSnapShot = {};
+        // 记录应用 A window 初始状态
+        Object.keys(window).forEach(prop => {
+          this.windowSnapShot[prop] = window[prop]
+        })
+        // 恢复到应用 A 上次失活之前的状态
+        Object.keys(this.modifyPropsMap).forEach(prop => {
+          window[prop] = this.modifyPropsMap[prop]
+        })
+      }
+      // 失活
+      inactive() {
+        this.modifyPropsMap = {}
+        Object.keys(window).forEach(prop => {
+          if (window[prop] !== this.windowSnapShot[prop]) {
+            this.modifyPropsMap[prop] = window[prop]; // 记录应用A 所做的所有修改
+            window[prop] = this.windowSnapShot[prop]; // 将 window 恢复到最初状态
+          }
+        })
+      }
+    }
+    let sandbox = new SnapshotSandbox();
+    sandbox.active();
+    window.a = 100;
+    window.b = 200;
+    sandbox.inactive();
+    console.log(window.a, window.b)
+    sandbox.active();
+    console.log(window.a, window.b)
+
+    // 如何使用的？
+    // (function (window) {
+    //   window.a = 100
+    // })(sandbox.proxy)
+  </script>
+</body>
+
+</html>
