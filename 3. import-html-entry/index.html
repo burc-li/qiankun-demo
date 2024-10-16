@@ -1,0 +1,40 @@
+<!-- subApp/index.html -->
+
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+  <meta charset="UTF-8">
+  <title>test</title>
+</head>
+
+<body>
+  <h3>import-html-entry Demo</h3>
+  <script type="importmap">
+    {
+       "imports": {
+          "import-html-entry": "https://cdn.jsdelivr.net/npm/import-html-entry@1.17.0/+esm"
+       }
+    }
+</script>
+  <script type="module">
+    import importHTML from 'import-html-entry'
+    importHTML('./subApp/subApp.html')
+      .then(res => {
+        console.log('assetPublicPath：', res.assetPublicPath)
+        console.log('template：', res.template)
+        res.execScripts().then(exports => {
+          console.log('execScripts', exports)
+        })
+        res.getExternalScripts().then(data => {
+          console.log('getExternalScripts', data)
+        })
+        res.getExternalStyleSheets().then(data => {
+          console.log('getExternalStyleSheets', data)
+        })
+
+      });
+  </script>
+</body>
+
+</html>

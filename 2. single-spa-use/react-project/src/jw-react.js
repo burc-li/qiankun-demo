@@ -13,8 +13,7 @@ const lifecycles = singleSpaReact({
   },
 });
 // 接入协议, 子应用必须提供接入协议
-// 对于 single-spa 而言, 暴露接入协议 就可以接入到项目中
+// 对于 single-spa 而言, 暴露接入协议就可以接入到项目中
 export const { bootstrap, mount, unmount } = lifecycles;
-
 
 // qiankun 写一个自己改写的接入协议

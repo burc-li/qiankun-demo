@@ -1,0 +1,29 @@
+<!-- subApp/index.html -->
+
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+  <meta charset="UTF-8">
+  <title>test</title>
+  <link href="./index.css" rel="stylesheet" type="text/css" />
+  <style>
+    h3 {
+      color: #000;
+      background-color: #f00;
+    }
+  </style>
+</head>
+
+<body>
+  <h3>子应用入口文件</h3>
+  <script src="https://unpkg.com/mobx@5.0.3/lib/mobx.umd.js" entry></script>
+  <script src="https://unpkg.com/react@16.4.2/umd/react.production.min.js"></script>
+  <script src="./index.js"></script>
+  <script>
+    const message = '内嵌js代码';
+    console.log(message);
+  </script>
+</body>
+
+</html>
